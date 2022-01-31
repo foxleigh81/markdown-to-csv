@@ -26,10 +26,22 @@ const startid = 1;
 // What files should be excluded from this process?
 const excluded = ['.DS_Store'];
 
+const headers = [
+  'id',
+  'title',
+  'body',
+  'created_at',
+  'updated_at',
+  'published_at',
+  'created_by_id',
+  'updated_by_id',
+  'allow_comments',
+  'tags',
+  'excerpt'
+]
 
 /********************/
 /* Start the Script */
-/* Do not edit */
 /********************/
 
 const arr = [];
@@ -42,7 +54,7 @@ if (!fs.existsSync(outputDirectory)) fs.mkdirSync(outputDirectory);
 if (!fs.existsSync(`${outputDirectory}/media`)) fs.mkdirSync(`${outputDirectory}/media`);
 
 const convertJsonToCsv = (json, id) => {
-  const csv = json.map((item, index) => {
+  const data = json.map((item, index) => {
 
     const {
       title,
@@ -64,9 +76,10 @@ const convertJsonToCsv = (json, id) => {
         .trim();
     };
 
-    return `${id+index},"${title}","${cleanContent(item.content)}",${formatDate(date) || ''},${formatDate(new Date()) || ''},${null}, 1, 1 ,${comments || true}, ${bgPos ? `bg-pos-${bgPos}` : ''},"${excerpt ? cleanContent(excerpt) : ''}"`;
+    return `${id+index},"${title}","${cleanContent(item.content)}","${formatDate(date)}","${formatDate(new Date())}","${formatDate(new Date())}", 1, 1 ,${comments || true}, ${bgPos ? `bg-pos-${bgPos.replace(/%/g, 'pc').replace(/ /g, '-')}` : ''},"${excerpt ? cleanContent(excerpt) : ''}"`;
   });
-  return csv.join('\n');
+  data.unshift(headers.join(','));
+  return data.join('\n');
 };
 
 sourceDirectory.forEach((directory) => {
